@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { useApiKey } from '@/context/ApiKeyContext';
@@ -31,7 +30,22 @@ const Step3Results: React.FC = () => {
         
         setAnalysisResult(result);
       } catch (error) {
-        toast.error('Failed to analyze image: ' + (error as Error).message);
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+        let userFriendlyMessage = 'Failed to analyze image';
+        
+        if (errorMessage.includes('invalid_api_key')) {
+          userFriendlyMessage = 'The API key appears to be invalid. Please check your settings.';
+        } else if (errorMessage.includes('insufficient_quota')) {
+          userFriendlyMessage = 'Your API quota has been exceeded. Please check your OpenAI account.';
+        } else if (errorMessage.includes('rate_limit')) {
+          userFriendlyMessage = 'Too many requests. Please try again in a few moments.';
+        }
+        
+        toast.error(userFriendlyMessage, {
+          description: 'If this issue persists, please contact support.',
+          duration: 5000
+        });
+
         setAnalysisResult({
           carMetadata: {
             make: 'To be determined',
@@ -41,7 +55,7 @@ const Step3Results: React.FC = () => {
           damageDescription: 'To be determined',
           repairEstimate: 'To be determined',
           isLoading: false,
-          error: (error as Error).message
+          error: userFriendlyMessage
         });
       } finally {
         setIsAnalyzing(false);

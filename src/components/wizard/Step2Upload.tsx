@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useWizard } from '@/context/WizardContext';
+import { useApiKey } from '@/context/ApiKeyContext';
 import WizardNav from '@/components/common/WizardNav';
 import ImageUploader from '@/components/common/ImageUploader';
 import { toast } from 'sonner';
@@ -10,11 +11,10 @@ const Step2Upload: React.FC = () => {
     imageData, 
     setImageData, 
     goToNextStep,
-    analysisResult,
     setAnalysisResult,
-    isAnalyzing,
     setIsAnalyzing
   } = useWizard();
+  const { isApiKeySet } = useApiKey();
 
   const handleImageSelect = (data: typeof imageData) => {
     setImageData(data);
@@ -30,6 +30,17 @@ const Step2Upload: React.FC = () => {
   const handleContinue = () => {
     if (!imageData) {
       toast.error('Please upload an image of the damaged car first');
+      return;
+    }
+
+    if (!isApiKeySet) {
+      toast.error(
+        'Please set your API key in the settings menu before proceeding',
+        {
+          description: 'Click the settings icon in the top right corner to set up your API key.',
+          duration: 5000
+        }
+      );
       return;
     }
     
@@ -58,7 +69,7 @@ const Step2Upload: React.FC = () => {
       <WizardNav
         onNext={handleContinue}
         disableNext={!imageData}
-        nextLabel={isAnalyzing ? 'Analyzing...' : 'Continue'}
+        nextLabel="Continue"
       />
     </div>
   );
