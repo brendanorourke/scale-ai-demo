@@ -29,17 +29,16 @@ const Step3Results: React.FC = () => {
           imageUrl: imageData.previewUrl,
           apiKey,
           onProgress: (progressResult) => {
+            // Always store the latest result, whether it's interim or final
+            setTempResult(progressResult);
+            
             if (!progressResult.isLoading) {
               // Final result received
-              setTempResult(progressResult);
               setAnalysisComplete(true);
               setIsAnalyzing(false);
               
-              // Only update the displayed result when analysis is complete
+              // Update the displayed result with final data
               setAnalysisResult(progressResult);
-            } else {
-              // Store intermediate results without affecting the UI
-              setTempResult(progressResult);
             }
           }
         });

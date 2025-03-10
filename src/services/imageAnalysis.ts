@@ -90,6 +90,7 @@ export const analyzeImage = async ({
     }
 
     const data = await response.json();
+    let finalResult: AnalysisResult = { ...defaultResult, isLoading: false };
     
     try {
       const content = data.choices[0].message.content;
@@ -98,7 +99,8 @@ export const analyzeImage = async ({
       if (jsonMatch) {
         const parsedData = JSON.parse(jsonMatch[0]);
         
-        const result: AnalysisResult = {
+        // Create the result, ensuring we don't overwrite valid data with default values
+        finalResult = {
           carMetadata: {
             make: parsedData.carMetadata?.make || defaultResult.carMetadata.make,
             model: parsedData.carMetadata?.model || defaultResult.carMetadata.model,
@@ -110,21 +112,21 @@ export const analyzeImage = async ({
         };
         
         if (onProgress) {
-          onProgress(result);
+          onProgress(finalResult);
         }
         
-        return result;
+        return finalResult;
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
+      // Don't overwrite any progress - just return what we have
     }
 
-    // Send final state with default values if parsing fails
-    const fallbackResult = { ...defaultResult, isLoading: false };
+    // If we reach here but already have valid data, don't overwrite it with defaults
     if (onProgress) {
-      onProgress(fallbackResult);
+      onProgress(finalResult);
     }
-    return fallbackResult;
+    return finalResult;
     
   } catch (error) {
     handleError(error, 'Failed to analyze image');
