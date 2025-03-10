@@ -106,6 +106,29 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     setUrlInput('');
   };
 
+  // Add capture event for the entire document to prevent default behavior
+  React.useEffect(() => {
+    // Only add these handlers if we're not in URL mode
+    if (!isUrlMode) {
+      const preventDefaults = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
+      
+      // Add event listeners to the document to prevent the browser from opening the image
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        document.addEventListener(eventName, preventDefaults, false);
+      });
+      
+      return () => {
+        // Clean up event listeners when component unmounts or when isUrlMode changes
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          document.removeEventListener(eventName, preventDefaults, false);
+        });
+      };
+    }
+  }, [isUrlMode]);
+
   const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -136,7 +159,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     if (files && files.length > 0) {
       processFile(files[0]);
     }
-  }, [isUrlMode, processFile]);
+  }, [isUrlMode]);
 
   return (
     <div className="w-full">
