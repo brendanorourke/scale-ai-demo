@@ -89,11 +89,10 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose }) => {
                   value={inputApiKey}
                   onChange={(e) => {
                     setInputApiKey(e.target.value);
-                    setIsEditing(true);
                   }}
                   onFocus={handleInputFocus}
                   type={showApiKey ? 'text' : 'password'}
-                  placeholder={apiKey ? "••••••••••••••••••••••" : "Enter your API key here"}
+                  placeholder="Enter your API key here"
                   className="pr-10"
                 />
                 <button

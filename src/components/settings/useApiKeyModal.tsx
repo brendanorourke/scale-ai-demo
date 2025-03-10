@@ -45,6 +45,7 @@ export const useApiKeyModal = (isOpen: boolean, onClose: () => void) => {
     setInputApiKey,
     showApiKey,
     isEditing,
+    setIsEditing,
     providers,
     activeProvider,
     handleInputFocus,
