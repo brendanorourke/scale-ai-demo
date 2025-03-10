@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { useApiKey } from '@/context/ApiKeyContext';
@@ -12,9 +13,17 @@ const Step3Results: React.FC = () => {
   const { apiKey, isApiKeySet } = useApiKey();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Reset analysis state when component mounts or image changes
+  useEffect(() => {
+    // Only reset if we have an image and no analysis is in progress
+    if (imageData && !isAnalyzing) {
+      setAnalysisResult(null);
+    }
+  }, [imageData, setAnalysisResult]);
+
   useEffect(() => {
     const performAnalysis = async () => {
-      if (!imageData || !isApiKeySet || analysisResult) return;
+      if (!imageData || !isApiKeySet || isAnalyzing || analysisResult) return;
 
       try {
         setIsAnalyzing(true);
@@ -63,7 +72,7 @@ const Step3Results: React.FC = () => {
     };
 
     performAnalysis();
-  }, [imageData, apiKey, isApiKeySet]);
+  }, [imageData, apiKey, isApiKeySet, analysisResult, isAnalyzing, setAnalysisResult, setIsAnalyzing]);
 
   if (!imageData) {
     return null;

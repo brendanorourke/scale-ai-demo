@@ -44,6 +44,8 @@ const Step2Upload: React.FC = () => {
       return;
     }
     
+    // Clear any previous analysis results before moving to the next step
+    setAnalysisResult(null);
     goToNextStep();
   };
 
