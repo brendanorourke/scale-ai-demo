@@ -49,9 +49,9 @@ const Step3Results: React.FC = () => {
 
         setAnalysisResult({
           carMetadata: {
-            make: 'Error occurred',
-            model: 'Error occurred',
-            color: 'Error occurred',
+            make: 'Error',
+            model: 'Error',
+            color: 'Error',
           },
           damageDescription: 'Error occurred during analysis',
           repairEstimate: 'Unable to estimate',

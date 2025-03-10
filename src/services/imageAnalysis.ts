@@ -1,3 +1,4 @@
+
 import { AnalysisResult } from '@/context/WizardContext';
 
 interface AnalyzeImageParams {
@@ -18,12 +19,12 @@ export const analyzeImage = async ({
   try {
     const defaultResult: AnalysisResult = {
       carMetadata: {
-        make: 'To be determined',
-        model: 'To be determined',
-        color: 'To be determined',
+        make: 'TBD',
+        model: 'TBD',
+        color: 'TBD',
       },
-      damageDescription: 'To be determined',
-      repairEstimate: 'To be determined',
+      damageDescription: 'TBD',
+      repairEstimate: 'TBD',
       isLoading: false
     };
 
