@@ -1,3 +1,4 @@
+
 import { AnalysisResult } from '@/context/WizardContext';
 
 interface AnalyzeImageParams {
@@ -98,16 +99,17 @@ export const analyzeImage = async ({
       if (jsonMatch) {
         const parsedData = JSON.parse(jsonMatch[0]);
         
-        // Keep existing API values that are valid and only use defaults for missing data
+        // IMPORTANT: Only use default values if the API didn't return anything or explicitly returned "To be determined"
+        // This ensures API data always takes priority
         const result: AnalysisResult = {
           carMetadata: {
-            make: parsedData.carMetadata.make && parsedData.carMetadata.make !== "To be determined" 
+            make: parsedData.carMetadata?.make && parsedData.carMetadata.make !== "To be determined" 
               ? parsedData.carMetadata.make 
               : defaultResult.carMetadata.make,
-            model: parsedData.carMetadata.model && parsedData.carMetadata.model !== "To be determined" 
+            model: parsedData.carMetadata?.model && parsedData.carMetadata.model !== "To be determined" 
               ? parsedData.carMetadata.model 
               : defaultResult.carMetadata.model,
-            color: parsedData.carMetadata.color && parsedData.carMetadata.color !== "To be determined" 
+            color: parsedData.carMetadata?.color && parsedData.carMetadata.color !== "To be determined" 
               ? parsedData.carMetadata.color 
               : defaultResult.carMetadata.color,
           },
@@ -120,6 +122,7 @@ export const analyzeImage = async ({
           isLoading: false
         };
         
+        console.log("Final analysis result:", result);
         return result;
       }
     } catch (parseError) {

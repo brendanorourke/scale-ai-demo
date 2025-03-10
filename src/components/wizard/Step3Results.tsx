@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { useApiKey } from '@/context/ApiKeyContext';
@@ -7,6 +6,7 @@ import { analyzeImage } from '@/services/imageAnalysis';
 import { toast } from 'sonner';
 import { Car, Wrench, DollarSign, Loader } from 'lucide-react';
 import SubmissionModal from './SubmissionModal';
+import { AnalysisResult } from '@/context/WizardContext';
 
 const Step3Results: React.FC = () => {
   const { imageData, analysisResult, setAnalysisResult, isAnalyzing, setIsAnalyzing } = useWizard();
@@ -17,8 +17,8 @@ const Step3Results: React.FC = () => {
   useEffect(() => {
     // Only reset if we have an image and no analysis is in progress
     if (imageData && !isAnalyzing) {
-      // Instead of immediately setting to null, we'll initialize with loading state
-      setAnalysisResult({
+      // Initialize with loading state
+      const initialState: AnalysisResult = {
         carMetadata: {
           make: 'To be determined',
           model: 'To be determined',
@@ -27,7 +27,8 @@ const Step3Results: React.FC = () => {
         damageDescription: 'To be determined',
         repairEstimate: 'To be determined',
         isLoading: true
-      });
+      };
+      setAnalysisResult(initialState);
     }
   }, [imageData, setAnalysisResult, isAnalyzing]);
 
@@ -40,29 +41,54 @@ const Step3Results: React.FC = () => {
         setIsAnalyzing(true);
         const imageUrl = imageData.previewUrl;
         
-        // Using onProgress to show loading state but not override completed fields
+        // Using onProgress to update with intermediate results
         const result = await analyzeImage({
           imageUrl,
           apiKey,
           onProgress: (progressResult) => {
-            // Only update if we're in a loading state
+            // Fixed: Create a new object that properly merges current and progress results
             if (progressResult.isLoading) {
-              setAnalysisResult(current => ({
-                ...current,
-                ...progressResult,
-                // Preserve any non-default values from the current state
+              // Create a properly typed object for the current state
+              const currentState = analysisResult || {
                 carMetadata: {
-                  make: current?.carMetadata.make !== 'To be determined' ? current.carMetadata.make : progressResult.carMetadata?.make || 'To be determined',
-                  model: current?.carMetadata.model !== 'To be determined' ? current.carMetadata.model : progressResult.carMetadata?.model || 'To be determined',
-                  color: current?.carMetadata.color !== 'To be determined' ? current.carMetadata.color : progressResult.carMetadata?.color || 'To be determined',
+                  make: 'To be determined',
+                  model: 'To be determined',
+                  color: 'To be determined',
                 },
-                damageDescription: current?.damageDescription !== 'To be determined' ? current.damageDescription : progressResult.damageDescription || 'To be determined',
-                repairEstimate: current?.repairEstimate !== 'To be determined' ? current.repairEstimate : progressResult.repairEstimate || 'To be determined',
-              }));
+                damageDescription: 'To be determined',
+                repairEstimate: 'To be determined',
+                isLoading: false
+              };
+              
+              // Merge carefully to preserve non-default values
+              const updatedState: AnalysisResult = {
+                carMetadata: {
+                  make: currentState.carMetadata.make !== 'To be determined' 
+                    ? currentState.carMetadata.make 
+                    : progressResult.carMetadata?.make || 'To be determined',
+                  model: currentState.carMetadata.model !== 'To be determined' 
+                    ? currentState.carMetadata.model 
+                    : progressResult.carMetadata?.model || 'To be determined',
+                  color: currentState.carMetadata.color !== 'To be determined' 
+                    ? currentState.carMetadata.color 
+                    : progressResult.carMetadata?.color || 'To be determined',
+                },
+                damageDescription: currentState.damageDescription !== 'To be determined' 
+                  ? currentState.damageDescription 
+                  : progressResult.damageDescription || 'To be determined',
+                repairEstimate: currentState.repairEstimate !== 'To be determined' 
+                  ? currentState.repairEstimate 
+                  : progressResult.repairEstimate || 'To be determined',
+                isLoading: progressResult.isLoading
+              };
+              
+              // Set the properly typed state
+              setAnalysisResult(updatedState);
             }
           }
         });
         
+        console.log("Setting final analysis result:", result);
         // Final result always takes precedence
         setAnalysisResult(result);
       } catch (error) {
@@ -82,7 +108,7 @@ const Step3Results: React.FC = () => {
           duration: 5000
         });
 
-        setAnalysisResult({
+        const errorState: AnalysisResult = {
           carMetadata: {
             make: 'To be determined',
             model: 'To be determined',
@@ -92,14 +118,16 @@ const Step3Results: React.FC = () => {
           repairEstimate: 'To be determined',
           isLoading: false,
           error: userFriendlyMessage
-        });
+        };
+        
+        setAnalysisResult(errorState);
       } finally {
         setIsAnalyzing(false);
       }
     };
 
     performAnalysis();
-  }, [imageData, apiKey, isApiKeySet, isAnalyzing, setAnalysisResult, setIsAnalyzing]);
+  }, [imageData, apiKey, isApiKeySet, isAnalyzing, setAnalysisResult, setIsAnalyzing, analysisResult]);
 
   if (!imageData) {
     return null;
