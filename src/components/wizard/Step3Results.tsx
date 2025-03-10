@@ -14,6 +14,7 @@ const Step3Results: React.FC = () => {
   const { imageData, analysisResult, setAnalysisResult, isAnalyzing, setIsAnalyzing } = useWizard();
   const { apiKey, isApiKeySet } = useApiKey();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tempResult, setTempResult] = useState<typeof analysisResult>(null);
 
   useEffect(() => {
     const performAnalysis = async () => {
@@ -27,12 +28,16 @@ const Step3Results: React.FC = () => {
           onProgress: (progressResult) => {
             if (!progressResult.isLoading) {
               setIsAnalyzing(false);
+              // Only update the final result when analysis is complete
+              setAnalysisResult(progressResult);
+            } else {
+              // Store intermediate results without showing them
+              setTempResult(progressResult);
             }
-            setAnalysisResult(progressResult);
           }
         });
       } catch (error) {
-        // Error is already handled in the analyzeImage function
+        setIsAnalyzing(false);
         setAnalysisResult({
           carMetadata: {
             make: 'Error',
@@ -43,7 +48,6 @@ const Step3Results: React.FC = () => {
           repairEstimate: 'Unable to estimate',
           isLoading: false
         });
-        setIsAnalyzing(false);
       }
     };
 
@@ -57,6 +61,7 @@ const Step3Results: React.FC = () => {
   }
 
   const isLoading = isAnalyzing || (analysisResult?.isLoading ?? false);
+  const showResults = !isLoading && analysisResult;
 
   return (
     <div className="wizard-step w-full max-w-4xl mx-auto">
@@ -77,7 +82,7 @@ const Step3Results: React.FC = () => {
             {isLoading ? (
               <LoadingState />
             ) : (
-              analysisResult && <AnalysisCard analysisResult={analysisResult} />
+              showResults && <AnalysisCard analysisResult={analysisResult} />
             )}
           </div>
         </div>
