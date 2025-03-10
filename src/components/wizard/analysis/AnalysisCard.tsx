@@ -8,7 +8,7 @@ interface AnalysisCardProps {
 }
 
 const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
-  // Function to display TBD if value is empty
+  // Function to display TBD if value is empty or undefined
   const displayValue = (value: string) => {
     return value ? value : 'TBD';
   };
