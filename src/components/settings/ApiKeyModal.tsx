@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useApiKey } from '@/context/ApiKeyContext';
 import { X, Eye, EyeOff, Key, Info } from 'lucide-react';
+import { useApiKeyModal } from './useApiKeyModal';
 
 interface ApiKeyModalProps {
   isOpen: boolean;
@@ -18,38 +18,19 @@ interface ApiKeyModalProps {
 }
 
 const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose }) => {
-  const { apiKey, setApiKey, clearApiKey, providers, activeProvider, setActiveProvider } = useApiKey();
-  const [inputApiKey, setInputApiKey] = useState('');
-  const [showApiKey, setShowApiKey] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-
-  // When the modal opens or apiKey changes, set the placeholder masks
-  useEffect(() => {
-    if (apiKey && !isEditing) {
-      setInputApiKey('••••••••••••••••••••••');
-    }
-  }, [apiKey, isOpen]);
-
-  const handleInputFocus = () => {
-    if (apiKey && !isEditing) {
-      setInputApiKey('');
-      setIsEditing(true);
-    }
-  };
-
-  const handleSave = () => {
-    if (inputApiKey && inputApiKey !== '••••••••••••••••••••••') {
-      setApiKey(inputApiKey);
-    }
-    setIsEditing(false);
-    onClose();
-  };
-
-  const handleClear = () => {
-    setInputApiKey('');
-    setIsEditing(true);
-    clearApiKey();
-  };
+  const {
+    inputApiKey,
+    setInputApiKey,
+    showApiKey,
+    isEditing,
+    providers,
+    activeProvider,
+    handleInputFocus,
+    handleSave,
+    handleClear,
+    toggleApiKeyVisibility,
+    setActiveProvider
+  } = useApiKeyModal(isOpen, onClose);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -117,7 +98,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose }) => {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowApiKey(!showApiKey)}
+                  onClick={toggleApiKeyVisibility}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
                   {showApiKey ? <EyeOff size={18} /> : <Eye size={18} />}
