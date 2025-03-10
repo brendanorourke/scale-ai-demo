@@ -1,114 +1,69 @@
+# Welcome to your Lovable project
 
-# 🚗 Car Damage Assessment Assistant
+## Project info
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+**URL**: https://lovable.dev/projects/b0b71e5b-a675-4347-805a-3275aa3c650a
 
-A modern web application for analyzing car damage using AI vision capabilities. Upload images of damaged vehicles to receive detailed assessments including vehicle identification, damage description, and repair cost estimates.
+## How can I edit this code?
 
-## 🚀 Live Demo
+There are several ways of editing your application.
 
-Visit [the deployed application](https://lovable.dev/projects/b0b71e5b-a675-4347-805a-3275aa3c650a) to try it out.
+**Use Lovable**
 
-## 📋 Features
+Simply visit the [Lovable Project](https://lovable.dev/projects/b0b71e5b-a675-4347-805a-3275aa3c650a) and start prompting.
 
-- **Image Upload**: Easily upload photos of damaged vehicles
-- **AI-Powered Analysis**: Get detailed assessment using advanced AI vision models
-- **Vehicle Identification**: Automatic detection of make, model, and color
-- **Damage Assessment**: Comprehensive description of visible damage
-- **Cost Estimation**: Approximate repair cost ranges in USD
-- **Provider Support**: Currently supports OpenAI (GPT-4o Vision), with Anthropic Claude coming soon
+Changes made via Lovable will be committed automatically to this repo.
 
-## 🛠️ Setup Instructions
+**Use your preferred IDE**
 
-### Prerequisites
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-- Node.js 16+ and npm
-- An OpenAI API key with access to GPT-4o
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-### Installation
+Follow these steps:
 
-Clone the repository and install dependencies:
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
 
-```bash
-# Clone the repository
-git clone <repository-url>
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
 
-# Navigate to the project directory
-cd car-damage-assessment
+# Step 3: Install the necessary dependencies.
+npm i
 
-# Install dependencies
-npm install
-```
-
-### Configuration
-
-This application requires an OpenAI API key to function. Your API key is stored securely in your browser's local storage.
-
-### Running the Application
-
-```bash
-# Start the development server
+# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-The application will be available at `http://localhost:8080`
+**Edit a file directly in GitHub**
 
-## 🏗️ Architecture Overview
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-### Technology Stack
+**Use GitHub Codespaces**
 
-- **Frontend Framework**: React 18 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS with custom insurance-themed color palette
-- **UI Components**: Shadcn UI
-- **Routing**: React Router
-- **State Management**: React Context API
-- **API Integration**: OpenAI GPT-4o vision API
-- **Data Fetching**: TanStack React Query
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-### Data Flow
+## What technologies are used for this project?
 
-1. **User Upload**: User uploads an image of a damaged vehicle
-2. **Image Processing**: Image is converted to base64 format for API transmission
-3. **API Request**: Encoded image is sent to OpenAI's API with a specialized prompt
-4. **Analysis**: The AI model analyzes the image for vehicle details and damage assessment
-5. **Response Processing**: JSON response is parsed and displayed to the user
-6. **User Interface**: Results are presented in an organized, easy-to-read format
+This project is built with .
 
-### Key Components
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
 
-- **WizardContext**: Manages the multi-step wizard flow and assessment data
-- **ApiKeyContext**: Handles API key storage and provider selection
-- **Image Analysis Service**: Interfaces with OpenAI's API for image analysis
-- **Step Components**: Dedicated components for each wizard step (Welcome, Upload, Results)
+## How can I deploy this project?
 
-## 📱 Responsive Design
+Simply open [Lovable](https://lovable.dev/projects/b0b71e5b-a675-4347-805a-3275aa3c650a) and click on Share -> Publish.
 
-The application is fully responsive and works on devices of all sizes, from mobile phones to desktop computers.
+## I want to use a custom domain - is that possible?
 
-## 🔐 Security
-
-- API keys are stored locally in the browser's localStorage
-- API keys are never transmitted to our servers
-- All API requests are made directly from the client to OpenAI
-
-## 🧩 Future Enhancements
-
-- **Anthropic Integration**: Support for Claude models coming soon
-- **Export Functionality**: Ability to export assessment reports as PDF
-- **History Management**: Save and review previous assessments
-- **Detailed Repair Breakdown**: Itemized repair cost estimates
-- **Multi-Image Support**: Analyze multiple angles of the same vehicle
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgements
-
-- [OpenAI](https://openai.com/) for providing the GPT-4o Vision API
-- [Shadcn UI](https://ui.shadcn.com/) for the component library
-- [Tailwind CSS](https://tailwindcss.com/) for the styling framework
-- [Vite](https://vitejs.dev/) for the build tool
+We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
