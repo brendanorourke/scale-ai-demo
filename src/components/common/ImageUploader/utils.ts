@@ -19,7 +19,6 @@ export const processFile = (
 ): void => {
   if (!file.type.startsWith('image/')) {
     throw new Error('Only image files are allowed');
-    return;
   }
   
   const reader = new FileReader();
