@@ -48,6 +48,7 @@ export const useApiKeyModal = (isOpen: boolean, onClose: () => void) => {
     setIsEditing,
     providers,
     activeProvider,
+    apiKey,
     handleInputFocus,
     handleSave,
     handleClear,
