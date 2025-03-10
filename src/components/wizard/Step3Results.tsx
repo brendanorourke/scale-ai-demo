@@ -15,6 +15,7 @@ const Step3Results: React.FC = () => {
   const { apiKey, isApiKeySet } = useApiKey();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempResult, setTempResult] = useState<typeof analysisResult>(null);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
 
   useEffect(() => {
     const performAnalysis = async () => {
@@ -22,22 +23,29 @@ const Step3Results: React.FC = () => {
 
       try {
         setIsAnalyzing(true);
+        setAnalysisComplete(false);
+        
         await analyzeImage({
           imageUrl: imageData.previewUrl,
           apiKey,
           onProgress: (progressResult) => {
             if (!progressResult.isLoading) {
+              // Final result received
+              setTempResult(progressResult);
+              setAnalysisComplete(true);
               setIsAnalyzing(false);
-              // Only update the final result when analysis is complete
+              
+              // Only update the displayed result when analysis is complete
               setAnalysisResult(progressResult);
             } else {
-              // Store intermediate results without showing them
+              // Store intermediate results without affecting the UI
               setTempResult(progressResult);
             }
           }
         });
       } catch (error) {
         setIsAnalyzing(false);
+        setAnalysisComplete(true);
         setAnalysisResult({
           carMetadata: {
             make: 'Error',
@@ -60,7 +68,8 @@ const Step3Results: React.FC = () => {
     return null;
   }
 
-  const isLoading = isAnalyzing || (analysisResult?.isLoading ?? false);
+  // Only show results when analysis is complete AND we have results
+  const isLoading = isAnalyzing || !analysisComplete;
   const showResults = !isLoading && analysisResult;
 
   return (
