@@ -27,7 +27,7 @@ export const analyzeImage = async ({
   }
 
   try {
-    console.log('[API] Starting image analysis...');
+    console.log('[API] Starting image analysis with URL:', imageUrl.substring(0, 20) + '...');
     
     // Initialize with empty values instead of placeholders
     const emptyResult: AnalysisResult = {
@@ -47,6 +47,7 @@ export const analyzeImage = async ({
       onProgress(emptyResult);
     }
 
+    console.log('[API] Making request to OpenAI API');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -96,22 +97,27 @@ export const analyzeImage = async ({
     });
 
     if (!response.ok) {
+      console.log('[API] Response not OK:', response.status, response.statusText);
       await handleApiError(response);
     }
 
-    console.log('[API] Received response from API');
+    console.log('[API] Received response from API, status:', response.status);
     const data = await response.json();
-    console.log('[API] Parsed JSON response');
+    console.log('[API] Parsed JSON response, message type:', data.choices[0].message.role);
     
     try {
       const content = data.choices[0].message.content;
-      console.log('[API] Raw content from API:', content);
+      console.log('[API] Raw content from API (first 100 chars):', content.substring(0, 100) + '...');
       
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       
       if (jsonMatch) {
-        const parsedData = JSON.parse(jsonMatch[0]);
-        console.log('[API] Successfully parsed JSON data:', parsedData);
+        const jsonContent = jsonMatch[0];
+        console.log('[API] Extracted JSON (first 100 chars):', jsonContent.substring(0, 100) + '...');
+        
+        const parsedData = JSON.parse(jsonContent);
+        console.log('[API] Successfully parsed JSON data, keys:', Object.keys(parsedData));
+        console.log('[API] Car metadata:', parsedData.carMetadata);
         
         // Prepare the result with known values or TBD for unknown
         const finalResult: AnalysisResult = {
@@ -133,6 +139,8 @@ export const analyzeImage = async ({
         }
         
         return finalResult;
+      } else {
+        console.log('[API] No JSON match found in content');
       }
     } catch (parseError) {
       console.error('[API] Failed to parse AI response:', parseError);

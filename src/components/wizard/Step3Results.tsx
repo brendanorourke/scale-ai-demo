@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { useApiKey } from '@/context/ApiKeyContext';
 import WizardNav from '@/components/common/WizardNav';
@@ -19,13 +19,32 @@ const Step3Results: React.FC = () => {
   
   // Create a local analysis state to prevent flicker
   const [currentAnalysisState, setCurrentAnalysisState] = useState<typeof analysisResult>(null);
+  
+  // Use a ref to track if we've already initiated analysis for this image
+  const analysisInitiatedRef = useRef(false);
 
   useEffect(() => {
+    console.log('[UI] Component mounted or dependencies changed');
+    console.log('[UI] Current state:', { 
+      hasImageData: !!imageData, 
+      hasApiKey: isApiKeySet, 
+      isAnalyzing, 
+      hasResult: !!analysisResult,
+      analysisComplete,
+      analysisInitiated: analysisInitiatedRef.current
+    });
+    
     const performAnalysis = async () => {
-      if (!imageData || !isApiKeySet || isAnalyzing) return;
+      if (!imageData || !isApiKeySet || isAnalyzing || analysisInitiatedRef.current) {
+        console.log('[UI] Skipping analysis due to conditions not met or already initiated');
+        return;
+      }
 
       try {
-        console.log('[UI] Starting analysis process');
+        console.log('[UI] Starting analysis process - marking as initiated');
+        // Set the ref to prevent duplicate API calls
+        analysisInitiatedRef.current = true;
+        
         // Reset state before starting
         setIsAnalyzing(true);
         setAnalysisComplete(false);
@@ -92,28 +111,53 @@ const Step3Results: React.FC = () => {
       }
     };
 
-    // Start analysis if we have an image but no analysis yet
-    if (imageData && !analysisResult && !isAnalyzing && !analysisComplete) {
-      console.log('[UI] Starting new analysis');
+    // We only want to start analysis when we have new image data and haven't analyzed it yet
+    if (imageData && !analysisComplete && !analysisInitiatedRef.current) {
+      console.log('[UI] Conditions met for starting new analysis');
       performAnalysis();
     }
     
-    // If we already have an analysis result, use it for the current state
+    // If we already have analysis results but no current state, use them (happens on component remount)
     if (analysisResult && !currentAnalysisState) {
       console.log('[UI] Using existing analysis result:', analysisResult);
       setCurrentAnalysisState(analysisResult);
+      setAnalysisComplete(true);
     }
+    
+    // Reset the initiated flag if the image changes
+    return () => {
+      if (!imageData) {
+        console.log('[UI] Resetting analysis initiated flag due to no image data');
+        analysisInitiatedRef.current = false;
+      }
+    };
   }, [
     imageData, 
     apiKey, 
     isApiKeySet, 
-    isAnalyzing, 
     setAnalysisResult, 
-    setIsAnalyzing, 
-    analysisResult, 
-    analysisComplete,
-    currentAnalysisState
+    setIsAnalyzing
   ]);
+  
+  // Effect to update currentAnalysisState when analysisResult changes
+  useEffect(() => {
+    if (analysisResult) {
+      console.log('[UI] Updating current analysis state from result:', analysisResult);
+      setCurrentAnalysisState(analysisResult);
+    }
+  }, [analysisResult]);
+
+  // Reset the initiated flag when imageData changes
+  useEffect(() => {
+    console.log('[UI] Image data changed, resetting analysis initiated flag');
+    analysisInitiatedRef.current = false;
+    
+    // If there's no image data, also reset other states
+    if (!imageData) {
+      setAnalysisComplete(false);
+      setCurrentAnalysisState(null);
+    }
+  }, [imageData]);
 
   if (!imageData) {
     return null;

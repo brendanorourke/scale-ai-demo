@@ -9,10 +9,18 @@ interface AnalysisCardProps {
 
 const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
   // Function to display TBD if value is empty
-  const displayValue = (value: string) => value || 'TBD';
+  const displayValue = (value: string) => {
+    return value ? value : 'TBD';
+  };
   
   useEffect(() => {
-    console.log('[UI:AnalysisCard] Rendering with data:', analysisResult);
+    console.log('[UI:AnalysisCard] Rendering with data:', {
+      make: analysisResult.carMetadata.make,
+      model: analysisResult.carMetadata.model,
+      color: analysisResult.carMetadata.color,
+      damageDescription: analysisResult.damageDescription,
+      repairEstimate: analysisResult.repairEstimate
+    });
   }, [analysisResult]);
   
   return (
