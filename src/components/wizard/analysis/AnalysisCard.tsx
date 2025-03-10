@@ -8,6 +8,9 @@ interface AnalysisCardProps {
 }
 
 const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
+  // Function to display TBD if value is empty
+  const displayValue = (value: string) => value || 'TBD';
+  
   return (
     <div className="flex flex-col">
       <div>
@@ -19,15 +22,15 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="text-xs text-gray-600 font-medium">Make</p>
-              <p className="font-semibold text-gray-800">{analysisResult.carMetadata.make}</p>
+              <p className="font-semibold text-gray-800">{displayValue(analysisResult.carMetadata.make)}</p>
             </div>
             <div>
               <p className="text-xs text-gray-600 font-medium">Model</p>
-              <p className="font-semibold text-gray-800">{analysisResult.carMetadata.model}</p>
+              <p className="font-semibold text-gray-800">{displayValue(analysisResult.carMetadata.model)}</p>
             </div>
             <div>
               <p className="text-xs text-gray-600 font-medium">Color</p>
-              <p className="font-semibold text-gray-800">{analysisResult.carMetadata.color}</p>
+              <p className="font-semibold text-gray-800">{displayValue(analysisResult.carMetadata.color)}</p>
             </div>
           </div>
         </div>
@@ -40,7 +43,7 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
         </div>
         <div className="bg-white shadow-sm p-4 rounded-md border border-gray-200">
           <p className="text-sm text-gray-800">
-            {analysisResult.damageDescription}
+            {displayValue(analysisResult.damageDescription)}
           </p>
         </div>
       </div>
@@ -51,7 +54,7 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
           <h3 className="font-medium text-insurance-general">Estimated Repair Cost</h3>
         </div>
         <div className="bg-white shadow-sm p-4 rounded-md border border-gray-200">
-          <p className="font-semibold text-gray-800">{analysisResult.repairEstimate}</p>
+          <p className="font-semibold text-gray-800">{displayValue(analysisResult.repairEstimate)}</p>
           <p className="text-xs text-gray-500 mt-2">
             *This is an AI-generated estimate and may differ from actual repair costs
           </p>

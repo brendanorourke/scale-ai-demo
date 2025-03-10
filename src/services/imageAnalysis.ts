@@ -8,6 +8,15 @@ interface AnalyzeImageParams {
   onProgress?: (result: AnalysisResult) => void;
 }
 
+// Returns true if a value is a placeholder like "TBD" or contains "determined"
+const isPlaceholderValue = (value: string): boolean => {
+  if (!value) return true;
+  const lowerValue = value.toLowerCase();
+  return lowerValue === 'tbd' || 
+         lowerValue.includes('determined') || 
+         lowerValue === 'unknown';
+};
+
 export const analyzeImage = async ({ 
   imageUrl, 
   apiKey,
@@ -18,23 +27,21 @@ export const analyzeImage = async ({
   }
 
   try {
-    const defaultResult: AnalysisResult = {
+    // Initialize with empty values instead of placeholders
+    const emptyResult: AnalysisResult = {
       carMetadata: {
-        make: 'TBD',
-        model: 'TBD',
-        color: 'TBD',
+        make: '',
+        model: '',
+        color: '',
       },
-      damageDescription: 'TBD',
-      repairEstimate: 'TBD',
-      isLoading: false
+      damageDescription: '',
+      repairEstimate: '',
+      isLoading: true
     };
 
     // Notify about starting analysis
     if (onProgress) {
-      onProgress({
-        ...defaultResult,
-        isLoading: true
-      });
+      onProgress(emptyResult);
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -54,7 +61,7 @@ export const analyzeImage = async ({
             2. A detailed description of the visible damage
             3. An estimated repair cost range in USD
             
-            If you cannot determine any information with confidence, respond with "To be determined" for that specific field.
+            If you cannot determine any information with confidence, respond with "TBD" for that specific field.
             Format your response as JSON with the following structure:
             {
               "carMetadata": {
@@ -90,8 +97,6 @@ export const analyzeImage = async ({
     }
 
     const data = await response.json();
-    // Initialize finalResult with default values
-    let finalResult: AnalysisResult = { ...defaultResult, isLoading: false };
     
     try {
       const content = data.choices[0].message.content;
@@ -100,29 +105,15 @@ export const analyzeImage = async ({
       if (jsonMatch) {
         const parsedData = JSON.parse(jsonMatch[0]);
         
-        // Only use parsed data when it's not the default placeholder ("TBD", "To be determined", etc.)
-        finalResult = {
+        // Prepare the result with known values or TBD for unknown
+        const finalResult: AnalysisResult = {
           carMetadata: {
-            make: parsedData.carMetadata?.make && 
-                 !parsedData.carMetadata.make.toLowerCase().includes('determined') ? 
-                  parsedData.carMetadata.make : defaultResult.carMetadata.make,
-                  
-            model: parsedData.carMetadata?.model && 
-                  !parsedData.carMetadata.model.toLowerCase().includes('determined') ? 
-                  parsedData.carMetadata.model : defaultResult.carMetadata.model,
-                  
-            color: parsedData.carMetadata?.color && 
-                  !parsedData.carMetadata.color.toLowerCase().includes('determined') ? 
-                  parsedData.carMetadata.color : defaultResult.carMetadata.color,
+            make: isPlaceholderValue(parsedData.carMetadata?.make) ? 'TBD' : parsedData.carMetadata.make,
+            model: isPlaceholderValue(parsedData.carMetadata?.model) ? 'TBD' : parsedData.carMetadata.model,
+            color: isPlaceholderValue(parsedData.carMetadata?.color) ? 'TBD' : parsedData.carMetadata.color,
           },
-          damageDescription: parsedData.damageDescription && 
-                            !parsedData.damageDescription.toLowerCase().includes('determined') ? 
-                            parsedData.damageDescription : defaultResult.damageDescription,
-                            
-          repairEstimate: parsedData.repairEstimate && 
-                         !parsedData.repairEstimate.toLowerCase().includes('determined') ? 
-                         parsedData.repairEstimate : defaultResult.repairEstimate,
-                         
+          damageDescription: isPlaceholderValue(parsedData.damageDescription) ? 'TBD' : parsedData.damageDescription,
+          repairEstimate: isPlaceholderValue(parsedData.repairEstimate) ? 'TBD' : parsedData.repairEstimate,
           isLoading: false
         };
         
@@ -134,17 +125,46 @@ export const analyzeImage = async ({
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
-      // Don't overwrite any progress - just return what we have
     }
 
-    // If we reach here but already have valid data, don't overwrite it with defaults
+    // If we reach here, we couldn't parse the response properly
+    const fallbackResult: AnalysisResult = {
+      carMetadata: {
+        make: 'TBD',
+        model: 'TBD',
+        color: 'TBD',
+      },
+      damageDescription: 'TBD',
+      repairEstimate: 'TBD',
+      isLoading: false
+    };
+    
     if (onProgress) {
-      onProgress(finalResult);
+      onProgress(fallbackResult);
     }
-    return finalResult;
+    
+    return fallbackResult;
     
   } catch (error) {
     handleError(error, 'Failed to analyze image');
+    
+    // Return TBD values on error
+    const errorResult: AnalysisResult = {
+      carMetadata: {
+        make: 'TBD',
+        model: 'TBD',
+        color: 'TBD',
+      },
+      damageDescription: 'TBD',
+      repairEstimate: 'TBD',
+      isLoading: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+    
+    if (onProgress) {
+      onProgress(errorResult);
+    }
+    
     throw error;
   }
 };
