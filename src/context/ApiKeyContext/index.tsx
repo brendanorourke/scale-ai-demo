@@ -1,22 +1,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { toast } from 'sonner';
-
-interface ApiProvider {
-  id: string;
-  name: string;
-  isActive: boolean;
-}
-
-interface ApiKeyContextType {
-  apiKey: string;
-  setApiKey: (key: string) => void;
-  isApiKeySet: boolean;
-  providers: ApiProvider[];
-  activeProvider: ApiProvider | null;
-  setActiveProvider: (provider: ApiProvider) => void;
-  clearApiKey: () => void;
-}
+import { ApiKeyContextType, ApiProvider } from './types';
 
 const ApiKeyContext = createContext<ApiKeyContextType | undefined>(undefined);
 

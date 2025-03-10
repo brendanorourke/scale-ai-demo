@@ -1,50 +1,6 @@
 
 import React, { createContext, useState, useContext } from 'react';
-
-export type ImageData = {
-  file?: File;
-  url?: string;
-  previewUrl: string;
-  name: string;
-  size: number;
-};
-
-export type AnalysisResult = {
-  carMetadata: {
-    make: string;
-    model: string;
-    color: string;
-  };
-  damageDescription: string;
-  repairEstimate: string;
-  isLoading: boolean;
-  error?: string;
-};
-
-interface WizardContextType {
-  currentStep: number;
-  setCurrentStep: (step: number) => void;
-  goToNextStep: () => void;
-  goToPreviousStep: () => void;
-  imageData: ImageData | null;
-  setImageData: (data: ImageData | null) => void;
-  analysisResult: AnalysisResult | null;
-  setAnalysisResult: (result: AnalysisResult | null) => void;
-  isAnalyzing: boolean;
-  setIsAnalyzing: (isAnalyzing: boolean) => void;
-  resetWizard: () => void;
-}
-
-const defaultAnalysisResult: AnalysisResult = {
-  carMetadata: {
-    make: 'TBD',
-    model: 'TBD',
-    color: 'TBD',
-  },
-  damageDescription: 'TBD',
-  repairEstimate: 'TBD',
-  isLoading: false,
-};
+import { WizardContextType, ImageData, AnalysisResult } from './types';
 
 const WizardContext = createContext<WizardContextType | undefined>(undefined);
 
@@ -97,3 +53,5 @@ export const useWizard = (): WizardContextType => {
   }
   return context;
 };
+
+export type { ImageData, AnalysisResult };

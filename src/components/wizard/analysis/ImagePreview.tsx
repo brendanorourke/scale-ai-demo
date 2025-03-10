@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ImageData } from '@/context/WizardContext';
+import { ImageData } from '@/context/WizardContext/types';
 
 interface ImagePreviewProps {
   imageData: ImageData;

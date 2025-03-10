@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Car, Wrench, DollarSign } from 'lucide-react';
-import { AnalysisResult } from '@/context/WizardContext';
+import { AnalysisResult } from '@/context/WizardContext/types';
 
 interface AnalysisCardProps {
   analysisResult: AnalysisResult;
