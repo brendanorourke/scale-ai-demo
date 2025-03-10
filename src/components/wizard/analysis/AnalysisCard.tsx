@@ -8,20 +8,27 @@ interface AnalysisCardProps {
 }
 
 const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
-  // Function to display TBD if value is empty or undefined
-  const displayValue = (value: string) => {
-    return value ? value : 'TBD';
+  // Function to display TBD if value is empty, undefined or contains placeholders
+  const displayValue = (value: string | undefined) => {
+    if (!value || value.trim() === '' || value.toLowerCase() === 'tbd' || value.toLowerCase().includes('undetermined')) {
+      return 'TBD';
+    }
+    return value;
   };
+  
+  // Safely access nested properties
+  const safeCarMeta = analysisResult?.carMetadata || { make: '', model: '', color: '' };
   
   useEffect(() => {
     console.log('[UI:AnalysisCard] Rendering with data:', {
-      make: analysisResult.carMetadata.make,
-      model: analysisResult.carMetadata.model,
-      color: analysisResult.carMetadata.color,
-      damageDescription: analysisResult.damageDescription,
-      repairEstimate: analysisResult.repairEstimate
+      make: safeCarMeta.make,
+      model: safeCarMeta.model,
+      color: safeCarMeta.color,
+      damageDescription: analysisResult?.damageDescription,
+      repairEstimate: analysisResult?.repairEstimate,
+      isLoading: analysisResult?.isLoading
     });
-  }, [analysisResult]);
+  }, [analysisResult, safeCarMeta]);
   
   return (
     <div className="flex flex-col">
@@ -34,15 +41,15 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="text-xs text-gray-600 font-medium">Make</p>
-              <p className="font-semibold text-gray-800">{displayValue(analysisResult.carMetadata.make)}</p>
+              <p className="font-semibold text-gray-800">{displayValue(safeCarMeta.make)}</p>
             </div>
             <div>
               <p className="text-xs text-gray-600 font-medium">Model</p>
-              <p className="font-semibold text-gray-800">{displayValue(analysisResult.carMetadata.model)}</p>
+              <p className="font-semibold text-gray-800">{displayValue(safeCarMeta.model)}</p>
             </div>
             <div>
               <p className="text-xs text-gray-600 font-medium">Color</p>
-              <p className="font-semibold text-gray-800">{displayValue(analysisResult.carMetadata.color)}</p>
+              <p className="font-semibold text-gray-800">{displayValue(safeCarMeta.color)}</p>
             </div>
           </div>
         </div>
@@ -55,7 +62,7 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
         </div>
         <div className="bg-white shadow-sm p-4 rounded-md border border-gray-200">
           <p className="text-sm text-gray-800">
-            {displayValue(analysisResult.damageDescription)}
+            {displayValue(analysisResult?.damageDescription)}
           </p>
         </div>
       </div>
@@ -66,7 +73,7 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
           <h3 className="font-medium text-insurance-general">Estimated Repair Cost</h3>
         </div>
         <div className="bg-white shadow-sm p-4 rounded-md border border-gray-200">
-          <p className="font-semibold text-gray-800">{displayValue(analysisResult.repairEstimate)}</p>
+          <p className="font-semibold text-gray-800">{displayValue(analysisResult?.repairEstimate)}</p>
           <p className="text-xs text-gray-500 mt-2">
             *This is an AI-generated estimate and may differ from actual repair costs
           </p>
