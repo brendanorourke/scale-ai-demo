@@ -5,7 +5,7 @@ import { useApiKey } from '@/context/ApiKeyContext';
 import WizardNav from '@/components/common/WizardNav';
 import { analyzeImage } from '@/services/imageAnalysis';
 import { toast } from 'sonner';
-import { Car, Tool, DollarSign, Loader } from 'lucide-react';
+import { Car, Wrench, DollarSign, Loader } from 'lucide-react';
 import SubmissionModal from './SubmissionModal';
 
 const Step3Results: React.FC = () => {
@@ -120,7 +120,7 @@ const Step3Results: React.FC = () => {
                 
                 <div>
                   <div className="flex items-center mb-2">
-                    <Tool className="mr-2 text-insurance-general" size={20} />
+                    <Wrench className="mr-2 text-insurance-general" size={20} />
                     <h3 className="font-medium">Damage Assessment</h3>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-md">
