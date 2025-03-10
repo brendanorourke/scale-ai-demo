@@ -25,6 +25,7 @@ const Step3Results: React.FC = () => {
       if (!imageData || !isApiKeySet || isAnalyzing) return;
 
       try {
+        console.log('[UI] Starting analysis process');
         // Reset state before starting
         setIsAnalyzing(true);
         setAnalysisComplete(false);
@@ -41,17 +42,25 @@ const Step3Results: React.FC = () => {
           isLoading: true
         };
         
+        console.log('[UI] Setting initial empty state:', initialState);
         setCurrentAnalysisState(initialState);
         
         await analyzeImage({
           imageUrl: imageData.previewUrl,
           apiKey,
           onProgress: (progressResult) => {
+            console.log('[UI] Received progress update:', progressResult);
+            
             // Update the current analysis state with each progress update
-            setCurrentAnalysisState(progressResult);
+            setCurrentAnalysisState(prevState => {
+              console.log('[UI] Updating from previous state:', prevState);
+              console.log('[UI] Updating to new state:', progressResult);
+              return progressResult;
+            });
             
             // Only when loading is complete do we finalize the result
             if (!progressResult.isLoading) {
+              console.log('[UI] Analysis complete, finalizing result');
               setAnalysisComplete(true);
               setIsAnalyzing(false);
               setAnalysisResult(progressResult);
@@ -59,7 +68,7 @@ const Step3Results: React.FC = () => {
           }
         });
       } catch (error) {
-        console.error('Analysis failed:', error);
+        console.error('[UI] Analysis failed:', error);
         
         // Handle error state
         setIsAnalyzing(false);
@@ -77,6 +86,7 @@ const Step3Results: React.FC = () => {
           error: error instanceof Error ? error.message : 'An error occurred during analysis'
         };
         
+        console.log('[UI] Setting error result:', errorResult);
         setCurrentAnalysisState(errorResult);
         setAnalysisResult(errorResult);
       }
@@ -84,11 +94,13 @@ const Step3Results: React.FC = () => {
 
     // Start analysis if we have an image but no analysis yet
     if (imageData && !analysisResult && !isAnalyzing && !analysisComplete) {
+      console.log('[UI] Starting new analysis');
       performAnalysis();
     }
     
     // If we already have an analysis result, use it for the current state
     if (analysisResult && !currentAnalysisState) {
+      console.log('[UI] Using existing analysis result:', analysisResult);
       setCurrentAnalysisState(analysisResult);
     }
   }, [
@@ -110,6 +122,9 @@ const Step3Results: React.FC = () => {
   // Display the appropriate component based on loading state
   const showLoading = isAnalyzing || (currentAnalysisState?.isLoading === true);
   const disableNext = showLoading || !analysisComplete;
+
+  console.log('[UI] Render state - showLoading:', showLoading, 'disableNext:', disableNext);
+  console.log('[UI] Current analysis state:', currentAnalysisState);
 
   return (
     <div className="wizard-step w-full max-w-4xl mx-auto">

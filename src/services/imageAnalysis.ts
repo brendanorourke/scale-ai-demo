@@ -27,6 +27,8 @@ export const analyzeImage = async ({
   }
 
   try {
+    console.log('[API] Starting image analysis...');
+    
     // Initialize with empty values instead of placeholders
     const emptyResult: AnalysisResult = {
       carMetadata: {
@@ -41,6 +43,7 @@ export const analyzeImage = async ({
 
     // Notify about starting analysis
     if (onProgress) {
+      console.log('[API] Setting initial empty state:', emptyResult);
       onProgress(emptyResult);
     }
 
@@ -96,14 +99,19 @@ export const analyzeImage = async ({
       await handleApiError(response);
     }
 
+    console.log('[API] Received response from API');
     const data = await response.json();
+    console.log('[API] Parsed JSON response');
     
     try {
       const content = data.choices[0].message.content;
+      console.log('[API] Raw content from API:', content);
+      
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       
       if (jsonMatch) {
         const parsedData = JSON.parse(jsonMatch[0]);
+        console.log('[API] Successfully parsed JSON data:', parsedData);
         
         // Prepare the result with known values or TBD for unknown
         const finalResult: AnalysisResult = {
@@ -117,17 +125,21 @@ export const analyzeImage = async ({
           isLoading: false
         };
         
+        console.log('[API] Final processed result:', finalResult);
+        
         if (onProgress) {
+          console.log('[API] Calling onProgress with final result');
           onProgress(finalResult);
         }
         
         return finalResult;
       }
     } catch (parseError) {
-      console.error('Failed to parse AI response:', parseError);
+      console.error('[API] Failed to parse AI response:', parseError);
     }
 
     // If we reach here, we couldn't parse the response properly
+    console.log('[API] Could not parse response, using fallback values');
     const fallbackResult: AnalysisResult = {
       carMetadata: {
         make: 'TBD',
@@ -140,12 +152,14 @@ export const analyzeImage = async ({
     };
     
     if (onProgress) {
+      console.log('[API] Calling onProgress with fallback result');
       onProgress(fallbackResult);
     }
     
     return fallbackResult;
     
   } catch (error) {
+    console.error('[API] Error during analysis:', error);
     handleError(error, 'Failed to analyze image');
     
     // Return TBD values on error
@@ -162,6 +176,7 @@ export const analyzeImage = async ({
     };
     
     if (onProgress) {
+      console.log('[API] Calling onProgress with error result');
       onProgress(errorResult);
     }
     

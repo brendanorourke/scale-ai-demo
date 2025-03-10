@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Car, Wrench, DollarSign } from 'lucide-react';
 import { AnalysisResult } from '@/context/WizardContext/types';
 
@@ -10,6 +10,10 @@ interface AnalysisCardProps {
 const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
   // Function to display TBD if value is empty
   const displayValue = (value: string) => value || 'TBD';
+  
+  useEffect(() => {
+    console.log('[UI:AnalysisCard] Rendering with data:', analysisResult);
+  }, [analysisResult]);
   
   return (
     <div className="flex flex-col">
