@@ -35,7 +35,7 @@ npm install
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173` by default.
+The application will be available at `http://localhost:8080` by default.
 
 ### API Key Configuration
 
