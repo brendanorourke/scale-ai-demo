@@ -90,6 +90,7 @@ export const analyzeImage = async ({
     }
 
     const data = await response.json();
+    // Initialize finalResult with default values
     let finalResult: AnalysisResult = { ...defaultResult, isLoading: false };
     
     try {
@@ -99,15 +100,29 @@ export const analyzeImage = async ({
       if (jsonMatch) {
         const parsedData = JSON.parse(jsonMatch[0]);
         
-        // Create the result, ensuring we don't overwrite valid data with default values
+        // Only use parsed data when it's not the default placeholder ("TBD", "To be determined", etc.)
         finalResult = {
           carMetadata: {
-            make: parsedData.carMetadata?.make || defaultResult.carMetadata.make,
-            model: parsedData.carMetadata?.model || defaultResult.carMetadata.model,
-            color: parsedData.carMetadata?.color || defaultResult.carMetadata.color,
+            make: parsedData.carMetadata?.make && 
+                 !parsedData.carMetadata.make.toLowerCase().includes('determined') ? 
+                  parsedData.carMetadata.make : defaultResult.carMetadata.make,
+                  
+            model: parsedData.carMetadata?.model && 
+                  !parsedData.carMetadata.model.toLowerCase().includes('determined') ? 
+                  parsedData.carMetadata.model : defaultResult.carMetadata.model,
+                  
+            color: parsedData.carMetadata?.color && 
+                  !parsedData.carMetadata.color.toLowerCase().includes('determined') ? 
+                  parsedData.carMetadata.color : defaultResult.carMetadata.color,
           },
-          damageDescription: parsedData.damageDescription || defaultResult.damageDescription,
-          repairEstimate: parsedData.repairEstimate || defaultResult.repairEstimate,
+          damageDescription: parsedData.damageDescription && 
+                            !parsedData.damageDescription.toLowerCase().includes('determined') ? 
+                            parsedData.damageDescription : defaultResult.damageDescription,
+                            
+          repairEstimate: parsedData.repairEstimate && 
+                         !parsedData.repairEstimate.toLowerCase().includes('determined') ? 
+                         parsedData.repairEstimate : defaultResult.repairEstimate,
+                         
           isLoading: false
         };
         

@@ -29,16 +29,42 @@ const Step3Results: React.FC = () => {
           imageUrl: imageData.previewUrl,
           apiKey,
           onProgress: (progressResult) => {
-            // Always store the latest result, whether it's interim or final
-            setTempResult(progressResult);
+            // For the first response (loading state), we initialize tempResult
+            if (progressResult.isLoading && !tempResult) {
+              setTempResult(progressResult);
+              return;
+            }
             
+            // For subsequent responses, carefully merge values to avoid overwriting good data with default values
+            const mergedResult = {
+              ...progressResult,
+              carMetadata: {
+                make: progressResult.carMetadata.make !== 'TBD' ? 
+                  progressResult.carMetadata.make : 
+                  (tempResult?.carMetadata.make || 'TBD'),
+                model: progressResult.carMetadata.model !== 'TBD' ? 
+                  progressResult.carMetadata.model : 
+                  (tempResult?.carMetadata.model || 'TBD'),
+                color: progressResult.carMetadata.color !== 'TBD' ? 
+                  progressResult.carMetadata.color : 
+                  (tempResult?.carMetadata.color || 'TBD'),
+              },
+              damageDescription: progressResult.damageDescription !== 'TBD' ? 
+                progressResult.damageDescription : 
+                (tempResult?.damageDescription || 'TBD'),
+              repairEstimate: progressResult.repairEstimate !== 'TBD' ? 
+                progressResult.repairEstimate : 
+                (tempResult?.repairEstimate || 'TBD'),
+            };
+            
+            // Update the temp result with our merged data
+            setTempResult(mergedResult);
+            
+            // Only when loading is complete do we update the final result and UI
             if (!progressResult.isLoading) {
-              // Final result received
               setAnalysisComplete(true);
               setIsAnalyzing(false);
-              
-              // Update the displayed result with final data
-              setAnalysisResult(progressResult);
+              setAnalysisResult(mergedResult);
             }
           }
         });
@@ -61,7 +87,7 @@ const Step3Results: React.FC = () => {
     if (imageData && !analysisResult) {
       performAnalysis();
     }
-  }, [imageData, apiKey, isApiKeySet, isAnalyzing, setAnalysisResult, setIsAnalyzing, analysisResult]);
+  }, [imageData, apiKey, isApiKeySet, isAnalyzing, setAnalysisResult, setIsAnalyzing, analysisResult, tempResult]);
 
   if (!imageData) {
     return null;
