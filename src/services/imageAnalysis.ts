@@ -1,10 +1,9 @@
-
 import { AnalysisResult } from '@/context/WizardContext';
 
 interface AnalyzeImageParams {
   imageUrl: string;
   apiKey: string;
-  onProgress?: (result: Partial<AnalysisResult>) => void;
+  onProgress?: (result: AnalysisResult) => void;
 }
 
 export const analyzeImage = async ({ 
@@ -92,69 +91,42 @@ export const analyzeImage = async ({
     const data = await response.json();
     
     try {
-      // Parse the assistant's message content to extract the JSON
       const content = data.choices[0].message.content;
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       
       if (jsonMatch) {
         const parsedData = JSON.parse(jsonMatch[0]);
         
-        // IMPORTANT: Only use default values if the API didn't return anything or explicitly returned "To be determined"
-        // This ensures API data always takes priority
         const result: AnalysisResult = {
           carMetadata: {
-            make: parsedData.carMetadata?.make && parsedData.carMetadata.make !== "To be determined" 
-              ? parsedData.carMetadata.make 
-              : defaultResult.carMetadata.make,
-            model: parsedData.carMetadata?.model && parsedData.carMetadata.model !== "To be determined" 
-              ? parsedData.carMetadata.model 
-              : defaultResult.carMetadata.model,
-            color: parsedData.carMetadata?.color && parsedData.carMetadata.color !== "To be determined" 
-              ? parsedData.carMetadata.color 
-              : defaultResult.carMetadata.color,
+            make: parsedData.carMetadata?.make || defaultResult.carMetadata.make,
+            model: parsedData.carMetadata?.model || defaultResult.carMetadata.model,
+            color: parsedData.carMetadata?.color || defaultResult.carMetadata.color,
           },
-          damageDescription: parsedData.damageDescription && parsedData.damageDescription !== "To be determined" 
-            ? parsedData.damageDescription 
-            : defaultResult.damageDescription,
-          repairEstimate: parsedData.repairEstimate && parsedData.repairEstimate !== "To be determined" 
-            ? parsedData.repairEstimate 
-            : defaultResult.repairEstimate,
+          damageDescription: parsedData.damageDescription || defaultResult.damageDescription,
+          repairEstimate: parsedData.repairEstimate || defaultResult.repairEstimate,
           isLoading: false
         };
         
-        // Make sure to send the final state with isLoading: false
         if (onProgress) {
           onProgress(result);
         }
         
-        console.log("Final analysis result:", result);
         return result;
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
     }
 
-    // Return default values if parsing fails
+    // Send final state with default values if parsing fails
     const fallbackResult = { ...defaultResult, isLoading: false };
-    
-    // Ensure we notify that loading is complete even if parsing failed
     if (onProgress) {
       onProgress(fallbackResult);
     }
-    
     return fallbackResult;
     
   } catch (error) {
     console.error('Error analyzing image:', error);
-    
-    // Ensure we notify that loading is complete even if an error occurred
-    if (onProgress) {
-      onProgress({
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'An unknown error occurred'
-      });
-    }
-    
     throw error;
   }
 };

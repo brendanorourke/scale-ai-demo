@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { useApiKey } from '@/context/ApiKeyContext';
@@ -16,21 +15,6 @@ const Step3Results: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (imageData && !isAnalyzing) {
-      setAnalysisResult({
-        carMetadata: {
-          make: 'To be determined',
-          model: 'To be determined',
-          color: 'To be determined',
-        },
-        damageDescription: 'To be determined',
-        repairEstimate: 'To be determined',
-        isLoading: true
-      });
-    }
-  }, [imageData, setAnalysisResult, isAnalyzing]);
-
-  useEffect(() => {
     const performAnalysis = async () => {
       if (!imageData || !isApiKeySet || isAnalyzing) return;
 
@@ -40,16 +24,10 @@ const Step3Results: React.FC = () => {
           imageUrl: imageData.previewUrl,
           apiKey,
           onProgress: (progressResult) => {
-            setAnalysisResult({
-              carMetadata: {
-                make: progressResult.carMetadata?.make || 'To be determined',
-                model: progressResult.carMetadata?.model || 'To be determined',
-                color: progressResult.carMetadata?.color || 'To be determined',
-              },
-              damageDescription: progressResult.damageDescription || 'To be determined',
-              repairEstimate: progressResult.repairEstimate || 'To be determined',
-              isLoading: progressResult.isLoading ?? true
-            });
+            if (!progressResult.isLoading) {
+              setIsAnalyzing(false);
+            }
+            setAnalysisResult(progressResult);
           }
         });
       } catch (error) {
@@ -71,21 +49,22 @@ const Step3Results: React.FC = () => {
 
         setAnalysisResult({
           carMetadata: {
-            make: 'To be determined',
-            model: 'To be determined',
-            color: 'To be determined',
+            make: 'Error occurred',
+            model: 'Error occurred',
+            color: 'Error occurred',
           },
-          damageDescription: 'To be determined',
-          repairEstimate: 'To be determined',
+          damageDescription: 'Error occurred during analysis',
+          repairEstimate: 'Unable to estimate',
           isLoading: false
         });
-      } finally {
         setIsAnalyzing(false);
       }
     };
 
-    performAnalysis();
-  }, [imageData, apiKey, isApiKeySet, isAnalyzing, setAnalysisResult, setIsAnalyzing]);
+    if (imageData && !analysisResult) {
+      performAnalysis();
+    }
+  }, [imageData, apiKey, isApiKeySet, isAnalyzing, setAnalysisResult, setIsAnalyzing, analysisResult]);
 
   if (!imageData) {
     return null;
