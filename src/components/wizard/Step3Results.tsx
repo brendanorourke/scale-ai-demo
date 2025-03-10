@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { useApiKey } from '@/context/ApiKeyContext';
@@ -42,14 +43,13 @@ const Step3Results: React.FC = () => {
         const imageUrl = imageData.previewUrl;
         
         // Using onProgress to update with intermediate results
-        const result = await analyzeImage({
+        await analyzeImage({
           imageUrl,
           apiKey,
           onProgress: (progressResult) => {
-            // Fixed: Create a new object that properly merges current and progress results
-            if (progressResult.isLoading) {
-              // Create a properly typed object for the current state
-              const currentState = analysisResult || {
+            setAnalysisResult((currentState) => {
+              // If currentState is null, initialize it with defaults
+              const baseState = currentState || {
                 carMetadata: {
                   make: 'To be determined',
                   model: 'To be determined',
@@ -57,40 +57,25 @@ const Step3Results: React.FC = () => {
                 },
                 damageDescription: 'To be determined',
                 repairEstimate: 'To be determined',
-                isLoading: false
+                isLoading: true
               };
               
-              // Merge carefully to preserve non-default values
-              const updatedState: AnalysisResult = {
+              // Create a new object that merges current state with progress updates
+              // while preserving any non-default values
+              return {
                 carMetadata: {
-                  make: currentState.carMetadata.make !== 'To be determined' 
-                    ? currentState.carMetadata.make 
-                    : progressResult.carMetadata?.make || 'To be determined',
-                  model: currentState.carMetadata.model !== 'To be determined' 
-                    ? currentState.carMetadata.model 
-                    : progressResult.carMetadata?.model || 'To be determined',
-                  color: currentState.carMetadata.color !== 'To be determined' 
-                    ? currentState.carMetadata.color 
-                    : progressResult.carMetadata?.color || 'To be determined',
+                  make: progressResult.carMetadata?.make || baseState.carMetadata.make,
+                  model: progressResult.carMetadata?.model || baseState.carMetadata.model,
+                  color: progressResult.carMetadata?.color || baseState.carMetadata.color,
                 },
-                damageDescription: currentState.damageDescription !== 'To be determined' 
-                  ? currentState.damageDescription 
-                  : progressResult.damageDescription || 'To be determined',
-                repairEstimate: currentState.repairEstimate !== 'To be determined' 
-                  ? currentState.repairEstimate 
-                  : progressResult.repairEstimate || 'To be determined',
-                isLoading: progressResult.isLoading
+                damageDescription: progressResult.damageDescription || baseState.damageDescription,
+                repairEstimate: progressResult.repairEstimate || baseState.repairEstimate,
+                isLoading: progressResult.isLoading !== undefined ? progressResult.isLoading : baseState.isLoading,
+                error: progressResult.error || baseState.error
               };
-              
-              // Set the properly typed state
-              setAnalysisResult(updatedState);
-            }
+            });
           }
         });
-        
-        console.log("Setting final analysis result:", result);
-        // Final result always takes precedence
-        setAnalysisResult(result);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
         let userFriendlyMessage = 'Failed to analyze image';
@@ -108,32 +93,34 @@ const Step3Results: React.FC = () => {
           duration: 5000
         });
 
-        const errorState: AnalysisResult = {
-          carMetadata: {
-            make: 'To be determined',
-            model: 'To be determined',
-            color: 'To be determined',
-          },
-          damageDescription: 'To be determined',
-          repairEstimate: 'To be determined',
+        // Ensure analysis result is updated with error state and isLoading set to false
+        setAnalysisResult((current) => ({
+          ...(current || {
+            carMetadata: {
+              make: 'To be determined',
+              model: 'To be determined',
+              color: 'To be determined',
+            },
+            damageDescription: 'To be determined',
+            repairEstimate: 'To be determined',
+          }),
           isLoading: false,
           error: userFriendlyMessage
-        };
-        
-        setAnalysisResult(errorState);
+        }));
       } finally {
         setIsAnalyzing(false);
       }
     };
 
     performAnalysis();
-  }, [imageData, apiKey, isApiKeySet, isAnalyzing, setAnalysisResult, setIsAnalyzing, analysisResult]);
+  }, [imageData, apiKey, isApiKeySet, isAnalyzing, setAnalysisResult, setIsAnalyzing]);
 
   if (!imageData) {
     return null;
   }
 
-  const isLoading = isAnalyzing || (analysisResult?.isLoading ?? true);
+  // Use the isLoading state from analysisResult to determine loading state
+  const isLoading = isAnalyzing || (analysisResult?.isLoading ?? false);
 
   return (
     <div className="wizard-step w-full max-w-4xl mx-auto">

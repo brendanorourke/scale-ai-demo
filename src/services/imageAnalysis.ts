@@ -122,6 +122,11 @@ export const analyzeImage = async ({
           isLoading: false
         };
         
+        // Make sure to send the final state with isLoading: false
+        if (onProgress) {
+          onProgress(result);
+        }
+        
         console.log("Final analysis result:", result);
         return result;
       }
@@ -130,10 +135,26 @@ export const analyzeImage = async ({
     }
 
     // Return default values if parsing fails
-    return defaultResult;
+    const fallbackResult = { ...defaultResult, isLoading: false };
+    
+    // Ensure we notify that loading is complete even if parsing failed
+    if (onProgress) {
+      onProgress(fallbackResult);
+    }
+    
+    return fallbackResult;
     
   } catch (error) {
     console.error('Error analyzing image:', error);
+    
+    // Ensure we notify that loading is complete even if an error occurred
+    if (onProgress) {
+      onProgress({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'An unknown error occurred'
+      });
+    }
+    
     throw error;
   }
 };
