@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Upload, Link2, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { ImageData } from '@/context/WizardContext';
@@ -17,12 +17,32 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 }) => {
   const [urlInput, setUrlInput] = useState('');
   const [isUrlMode, setIsUrlMode] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     
+    if (!file.type.startsWith('image/')) {
+      toast.error('Only image files are allowed');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = () => {
+      const previewUrl = reader.result as string;
+      onImageSelect({
+        file,
+        previewUrl,
+        name: file.name,
+        size: file.size,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
       toast.error('Only image files are allowed');
       return;
@@ -86,6 +106,38 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     setUrlInput('');
   };
 
+  const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isUrlMode) return;
+    setIsDragging(true);
+  }, [isUrlMode]);
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isUrlMode) return;
+    if (!isDragging) setIsDragging(true);
+  }, [isUrlMode, isDragging]);
+
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (isUrlMode) return;
+    
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      processFile(files[0]);
+    }
+  }, [isUrlMode, processFile]);
+
   return (
     <div className="w-full">
       {!selectedImage ? (
@@ -144,10 +196,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           ) : (
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-insurance-general transition-colors"
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`border-2 ${isDragging ? 'border-insurance-general bg-insurance-general/10' : 'border-gray-300'} border-dashed rounded-lg p-12 text-center cursor-pointer hover:border-insurance-general transition-colors`}
             >
-              <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
-              <div className="mt-4 flex text-sm text-gray-600">
+              <ImageIcon className={`mx-auto h-12 w-12 ${isDragging ? 'text-insurance-general' : 'text-gray-400'}`} />
+              <div className="mt-4 flex text-sm text-gray-600 justify-center">
                 <label className="relative cursor-pointer rounded-md font-medium text-insurance-general focus-within:outline-none">
                   <span>Upload a file</span>
                 </label>
