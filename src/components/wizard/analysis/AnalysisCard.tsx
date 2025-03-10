@@ -13,21 +13,21 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
       <div>
         <div className="flex items-center mb-2">
           <Car className="mr-2 text-insurance-general" size={20} />
-          <h3 className="font-medium">Vehicle Information</h3>
+          <h3 className="font-medium text-insurance-general">Vehicle Information</h3>
         </div>
-        <div className="bg-gray-50 p-3 rounded-md">
+        <div className="bg-white shadow-sm p-4 rounded-md border border-gray-200">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <p className="text-xs text-gray-500">Make</p>
-              <p className="font-medium">{analysisResult.carMetadata.make}</p>
+              <p className="text-xs text-gray-600 font-medium">Make</p>
+              <p className="font-semibold text-gray-800">{analysisResult.carMetadata.make}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Model</p>
-              <p className="font-medium">{analysisResult.carMetadata.model}</p>
+              <p className="text-xs text-gray-600 font-medium">Model</p>
+              <p className="font-semibold text-gray-800">{analysisResult.carMetadata.model}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Color</p>
-              <p className="font-medium">{analysisResult.carMetadata.color}</p>
+              <p className="text-xs text-gray-600 font-medium">Color</p>
+              <p className="font-semibold text-gray-800">{analysisResult.carMetadata.color}</p>
             </div>
           </div>
         </div>
@@ -36,10 +36,10 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
       <div className="mt-6">
         <div className="flex items-center mb-2">
           <Wrench className="mr-2 text-insurance-general" size={20} />
-          <h3 className="font-medium">Damage Assessment</h3>
+          <h3 className="font-medium text-insurance-general">Damage Assessment</h3>
         </div>
-        <div className="bg-gray-50 p-3 rounded-md">
-          <p className="text-sm">
+        <div className="bg-white shadow-sm p-4 rounded-md border border-gray-200">
+          <p className="text-sm text-gray-800">
             {analysisResult.damageDescription}
           </p>
         </div>
@@ -48,11 +48,11 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysisResult }) => {
       <div className="mt-6">
         <div className="flex items-center mb-2">
           <DollarSign className="mr-2 text-insurance-general" size={20} />
-          <h3 className="font-medium">Estimated Repair Cost</h3>
+          <h3 className="font-medium text-insurance-general">Estimated Repair Cost</h3>
         </div>
-        <div className="bg-gray-50 p-3 rounded-md">
-          <p className="font-medium">{analysisResult.repairEstimate}</p>
-          <p className="text-xs text-gray-500 mt-1">
+        <div className="bg-white shadow-sm p-4 rounded-md border border-gray-200">
+          <p className="font-semibold text-gray-800">{analysisResult.repairEstimate}</p>
+          <p className="text-xs text-gray-500 mt-2">
             *This is an AI-generated estimate and may differ from actual repair costs
           </p>
         </div>
