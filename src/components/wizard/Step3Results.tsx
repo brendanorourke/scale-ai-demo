@@ -4,7 +4,7 @@ import { useWizard } from '@/context/WizardContext';
 import { useApiKey } from '@/context/ApiKeyContext';
 import WizardNav from '@/components/common/WizardNav';
 import { analyzeImage } from '@/services/imageAnalysis';
-import { toast } from 'sonner';
+import { handleError } from '@/utils/errorHandling';
 import SubmissionModal from './SubmissionModal';
 import ImagePreview from './analysis/ImagePreview';
 import AnalysisCard from './analysis/AnalysisCard';
@@ -32,22 +32,7 @@ const Step3Results: React.FC = () => {
           }
         });
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-        let userFriendlyMessage = 'Failed to analyze image';
-        
-        if (errorMessage.includes('invalid_api_key')) {
-          userFriendlyMessage = 'The API key appears to be invalid. Please check your settings.';
-        } else if (errorMessage.includes('insufficient_quota')) {
-          userFriendlyMessage = 'Your API quota has been exceeded. Please check your OpenAI account.';
-        } else if (errorMessage.includes('rate_limit')) {
-          userFriendlyMessage = 'Too many requests. Please try again in a few moments.';
-        }
-        
-        toast.error(userFriendlyMessage, {
-          description: 'If this issue persists, please contact support.',
-          duration: 5000
-        });
-
+        // Error is already handled in the analyzeImage function
         setAnalysisResult({
           carMetadata: {
             make: 'Error',

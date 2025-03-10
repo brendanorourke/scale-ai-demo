@@ -1,5 +1,6 @@
 
 import { AnalysisResult } from '@/context/WizardContext';
+import { handleError, handleApiError } from '@/utils/errorHandling';
 
 interface AnalyzeImageParams {
   imageUrl: string;
@@ -85,8 +86,7 @@ export const analyzeImage = async ({
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'API request failed');
+      await handleApiError(response);
     }
 
     const data = await response.json();
@@ -127,7 +127,7 @@ export const analyzeImage = async ({
     return fallbackResult;
     
   } catch (error) {
-    console.error('Error analyzing image:', error);
+    handleError(error, 'Failed to analyze image');
     throw error;
   }
 };
