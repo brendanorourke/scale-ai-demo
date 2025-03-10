@@ -17,26 +17,53 @@ const Step3Results: React.FC = () => {
   useEffect(() => {
     // Only reset if we have an image and no analysis is in progress
     if (imageData && !isAnalyzing) {
-      setAnalysisResult(null);
+      // Instead of immediately setting to null, we'll initialize with loading state
+      setAnalysisResult({
+        carMetadata: {
+          make: 'To be determined',
+          model: 'To be determined',
+          color: 'To be determined',
+        },
+        damageDescription: 'To be determined',
+        repairEstimate: 'To be determined',
+        isLoading: true
+      });
     }
-  }, [imageData, setAnalysisResult]);
+  }, [imageData, setAnalysisResult, isAnalyzing]);
 
   useEffect(() => {
     const performAnalysis = async () => {
-      if (!imageData || !isApiKeySet || isAnalyzing || analysisResult) return;
+      // Only proceed if we have an image, API key is set, and not already analyzing
+      if (!imageData || !isApiKeySet || isAnalyzing) return;
 
       try {
         setIsAnalyzing(true);
         const imageUrl = imageData.previewUrl;
         
+        // Using onProgress to show loading state but not override completed fields
         const result = await analyzeImage({
           imageUrl,
           apiKey,
           onProgress: (progressResult) => {
-            setAnalysisResult(progressResult as any);
+            // Only update if we're in a loading state
+            if (progressResult.isLoading) {
+              setAnalysisResult(current => ({
+                ...current,
+                ...progressResult,
+                // Preserve any non-default values from the current state
+                carMetadata: {
+                  make: current?.carMetadata.make !== 'To be determined' ? current.carMetadata.make : progressResult.carMetadata?.make || 'To be determined',
+                  model: current?.carMetadata.model !== 'To be determined' ? current.carMetadata.model : progressResult.carMetadata?.model || 'To be determined',
+                  color: current?.carMetadata.color !== 'To be determined' ? current.carMetadata.color : progressResult.carMetadata?.color || 'To be determined',
+                },
+                damageDescription: current?.damageDescription !== 'To be determined' ? current.damageDescription : progressResult.damageDescription || 'To be determined',
+                repairEstimate: current?.repairEstimate !== 'To be determined' ? current.repairEstimate : progressResult.repairEstimate || 'To be determined',
+              }));
+            }
           }
         });
         
+        // Final result always takes precedence
         setAnalysisResult(result);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -72,13 +99,13 @@ const Step3Results: React.FC = () => {
     };
 
     performAnalysis();
-  }, [imageData, apiKey, isApiKeySet, analysisResult, isAnalyzing, setAnalysisResult, setIsAnalyzing]);
+  }, [imageData, apiKey, isApiKeySet, isAnalyzing, setAnalysisResult, setIsAnalyzing]);
 
   if (!imageData) {
     return null;
   }
 
-  const isLoading = isAnalyzing || !analysisResult;
+  const isLoading = isAnalyzing || (analysisResult?.isLoading ?? true);
 
   return (
     <div className="wizard-step w-full max-w-4xl mx-auto">
