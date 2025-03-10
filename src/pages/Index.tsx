@@ -1,13 +1,33 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+import React from 'react';
+import Layout from '@/components/layout/Layout';
+import Step1Welcome from '@/components/wizard/Step1Welcome';
+import Step2Upload from '@/components/wizard/Step2Upload';
+import Step3Results from '@/components/wizard/Step3Results';
+import { WizardProvider, useWizard } from '@/context/WizardContext';
+import { ApiKeyProvider } from '@/context/ApiKeyContext';
+
+const WizardSteps: React.FC = () => {
+  const { currentStep } = useWizard();
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="wizard-container">
+      {currentStep === 1 && <Step1Welcome />}
+      {currentStep === 2 && <Step2Upload />}
+      {currentStep === 3 && <Step3Results />}
     </div>
+  );
+};
+
+const Index: React.FC = () => {
+  return (
+    <ApiKeyProvider>
+      <WizardProvider>
+        <Layout>
+          <WizardSteps />
+        </Layout>
+      </WizardProvider>
+    </ApiKeyProvider>
   );
 };
 
