@@ -79,10 +79,10 @@ src/
 
 ### Key Components
 
-- 🧙 **Wizard Flow**: Multi-step process for guiding presentation and discussion around key milestones in the flow.
-- 📷 **Image Uploader**: Easy file uploads with drag-and-drop and URL imports to allow for multiple demos on the same page.
-- 🔑 **API Key Management**: Local storage of API keys for security and ease of use.
-- 🤝 **API Integration**: Integrates directly with OpenAI's API (with future support for Anthropic) to abstract backend components.
+- 🧙 **Wizard Flow**: Multi-step process for guiding presentation and discussion.
+- 📷 **Image Uploader**: Easy file uploads with drag-and-drop and URL imports.
+- 🔑 **API Key Management**: API keys in localStorage for ease and security.
+- 🤝 **API Integration**: Integrates directly with OpenAI's API (+ later Claude).
 - 📱 **Responsive UI**: Mobile-friendly design that works across devices.
 
 ## Brief Design Explanation
