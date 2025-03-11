@@ -89,10 +89,10 @@ src/
 
 ### Tools Used
 - ❤️ [Lovable.dev](https://lovable.dev/): Used for rapid prototyping, iteration, and hosting. Key reasons for selection include:
-  - Satisfied goal of removing as much manual dev/boilerplate as possible, given 3h target for ideation, dev, testing, and docs.
-  - Positive developer community sentiment (e.g., on Reddit).
-  - Integration with GitHub for step-by-step (commit level) transparency and easy code edits (Bolt.new does not integrate directly).
-  - Handles hosting natively, although in the future would like to assess vs. Vercel/Netlify.
+  - Removed as much manual dev/boilerplate/infra as possible, given 3h target for ideation, dev, testing, and docs.
+  - Integration with GitHub for commit-level transparency and easy code edits.
+  - Hosts natively, although in the future would like to assess vs. Vercel/Netlify.
+  - Positive developer sentiment (e.g., on Reddit).
   - Honestly, I wanted to try it out 😊
 - 🎨 [Coolors](https://coolors.co/): Quick iterative tool to find a "cool" color palette-- fast.
 
