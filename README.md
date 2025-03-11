@@ -94,6 +94,7 @@ src/
   - Integration with GitHub for step-by-step (commit level) transparency and easy code edits (Bolt.new does not integrate directly).
   - Handles hosting natively, although in the future would like to assess vs. Vercel/Netlify.
   - Honestly, I wanted to try it out 😊
+- 🎨 [Coolors](https://coolors.co/): Quick iterative tool to find a "cool" color palette-- fast.
 
 ### Key Compromises
 
