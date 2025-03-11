@@ -5,7 +5,7 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-A web application to demonstrate the usage of AI vision capabilities for frontline assessments of vehicle indentification, damage description, and repair cost estimates.
+A web application to demonstrate the usage of AI vision capabilities for frontline assessments of vehicle identification, damage description, and repair cost estimates.
 
 ## Usage
 
@@ -73,7 +73,7 @@ src/
 2. **Image Upload**: User uploads an image (`src/components/wizard/Step2Upload.tsx`)
 3. **Results**: User moves to results page ( `src/components/wizard/Step3Results.tsx`)
 4. **API Request**: `Step3Results.tsx` initiates the analysis process, calling `analyzeImage()` from `services/imageAnalysis.ts`
-5. **API Request Processing**: `analyzeImage()` validations the API key and makes a POST request to OpenAI with encoded image data and prompt.
+5. **API Request Processing**: `analyzeImage()` validates the API key and makes a POST request to OpenAI with encoded image data and prompt.
 6. **API Response Processing**: Data parsed in JSON and provided via `onProgress` callback.
 7. **UI Update**: `Step3Results.tsx` receives the result via `setAnalysisResult()` function, displaying either loading state, results or errors.
 
@@ -99,7 +99,7 @@ src/
 ### Key Compromises
 
 - 💽 **Backend**: Given time constraint and lack of _emphasis_ on backend functionality in the prompt, we're assuming that backend functionality was not a primary concern for the prospect.
-  - Thus, the processing logic is handled directly with OpenAI's API without a dediated backend service.
+  - Thus, the processing logic is handled directly with OpenAI's API without a dedicated backend service.
   - Benefit: Minimal complexity and opportunity for error in the demo.
   - Benefit: Easy reference of functionality by developers, as a full backend service would be largely boilerplate.
   - Compromise: If the technical audience had specific backend-related concerns, this would obviously not satisfy that.
@@ -121,8 +121,8 @@ src/
 ### Potential Improvements
 - **Multiple Images**: Ability for the user to submit multiple images with multiple angles of the car.
   - Would potentially increase efficacy and mimic real-world use cases more closely.
-- **History Management**: Ability to submit multiple claims asssessments and having those be referencable on a Dashbaord page.
-  - Potentially with "Status" after submission to demonstrate how a user would manage these claims submissions.
+- **History Management**: Ability to submit multiple claims assessments which can be referenced on a Dashboard page.
+  - Demo a "Status" after submission to demonstrate how claims submissions may be managed after submission.
 - **Detailed Repair Breakdown**: In addition to a high-level cost range, break down an itemized estimate-- would require testing and possible fine tuning.
 - **User Authentication**: To support the above, we would ideally also have user authentication, which would require the implementation of a backend.
   - Users can submit images and come back later to reference them.
